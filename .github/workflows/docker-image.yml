@@ -1,0 +1,32 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Realizando login na Azure
+      uses: Azure/login@v1.1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Criando instância do ACI e realizando o deploy da última imagem do Jenkins disponível no DockerHub
+      uses: Azure/aci-deploy@v1
+      with:
+        resource-group: "rg-jenkins"
+        dns-name-label: "renan-jenkins"
+        image: jenkins:latest
+        ports: 8080
+        location: "Brazil South"
+        name: "jenkins-app"
+
